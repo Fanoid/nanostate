@@ -1,0 +1,5 @@
+message PBTrackball {
+  optional double f_scale = 1 [ default = 1.0 ]; 
+  repeated double q_r = 2; 
+  repeated double v_trans = 3;  
+}; 

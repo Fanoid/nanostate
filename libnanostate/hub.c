@@ -22,6 +22,7 @@ int main (const int argc, const char **argv)
     int count = nn_recv(sock, &buf, NN_MSG, 0);
     if (count >= 0)
     {
+      fprintf(stderr, "Received.\n");
       int send = nn_send(sock, buf, count, 0);
       assert (send == count);
       nn_freemsg (buf);

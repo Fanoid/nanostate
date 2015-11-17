@@ -60,15 +60,15 @@ void Nanostate::recv_state_update(string &sender, string &name, string &data)
 
 bool Nanostate::has_state_update()
 {
-  struct nn_pollfd pfd;
-  pfd.fd = _sock;
-  pfd.events = NN_POLLIN;
-  int rc = nn_poll(&pfd, 1, 1000);
+  struct nn_pollfd pfd[1];
+  pfd[0].fd = _sock;
+  pfd[0].events = NN_POLLIN;
+  int rc = nn_poll(pfd, 1, 1000);
   if (rc < 0)
   {
     fprintf(stderr, "nn_poll %s\n", nn_strerror(errno));
     return false;
   }
-  return rc > 0;
+  return (pfd[0].revents && NN_POLLIN);
 }
 

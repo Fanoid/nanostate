@@ -12,7 +12,8 @@ public:
   void send_state_update(const std::string &name, const std::string &data);
   void recv_state_update(std::string &sender, std::string &name, std::string &data);
   bool has_state_update();
-private:
+  const std::string &get_identity() const { return _identity; }
+protected:
   std::string _identity;
   int _sock;
 };
