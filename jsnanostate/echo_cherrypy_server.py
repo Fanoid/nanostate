@@ -26,7 +26,8 @@ class Root(object):
     def index(self):
         return """<html>
     <head>
-      <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
+      <script type='application/javascript' src='/js/jquery.min.js'></script>
+      <script type='application/javascript' src='/js/msgpack.min.js'></script>
       <script type='application/javascript'>
         $(document).ready(function() {
 
@@ -41,6 +42,7 @@ class Root(object):
             console.log('WebSocket Not Supported');
             return;
           }
+          ws.binaryType = 'arraybuffer'
 
           window.onbeforeunload = function(e) {
             $('#chat').val($('#chat').val() + 'Bye bye...\\n');
@@ -51,7 +53,16 @@ class Root(object):
             e.preventDefault();
           };
           ws.onmessage = function (evt) {
-             $('#chat').val($('#chat').val() + evt.data + '\\n');
+             if (typeof(evt.data) === "string")
+             {
+                $('#chat').val($('#chat').val() + evt.data + '\\n');
+             }
+             else
+             {
+                buf = new Uint8Array(evt.data)
+                state = msgpack.decode(buf)
+                $('#chat').val($('#chat').val() + 'state: ' + state + '\\n');
+             }
           };
           ws.onopen = function() {
              ws.send("%(username)s entered the room");
@@ -61,8 +72,9 @@ class Root(object):
           };
 
           $('#send').click(function() {
-             console.log($('#message').val());
              ws.send('%(username)s: ' + $('#message').val());
+             buf = msgpack.encode(['Hello', 'World'])
+             ws.send(buf)
              $('#message').val("");
              return false;
           });
@@ -97,7 +109,7 @@ if __name__ == '__main__':
 
     cherrypy.config.update({'server.socket_host': args.host,
                             'server.socket_port': args.port,
-                            'tools.staticdir.root': os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))})
+                            'tools.staticdir.root': os.path.abspath(os.path.dirname(__file__))})
 
     if args.ssl:
         cherrypy.config.update({'server.ssl_certificate': './server.crt',
