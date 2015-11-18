@@ -15,15 +15,15 @@ Nanostate::Nanostate(const char *identity, const char *addr)
   _identity = identity;
   _sock = nn_socket(AF_SP, NN_BUS);
   if (( _sock = nn_socket(AF_SP, NN_BUS)) < 0)
-    fprintf(stderr, "nn_socket %s\n", nn_strerror(errno));
+    fprintf(stderr, "nn_socket failed: %s\n", nn_strerror(errno));
   if (nn_connect(_sock, addr) < 0)
-    fprintf(stderr, "nn_bind %s\n", nn_strerror(errno));
+    fprintf(stderr, "nn_bind failed: %s\n", nn_strerror(errno));
 }
 
 Nanostate::~Nanostate()
 {
   if (nn_shutdown(_sock, 0) < 0)
-    fprintf(stderr, "nn_shutdown %s\n", nn_strerror(errno));
+    fprintf(stderr, "nn_shutdown failed: %s\n", nn_strerror(errno));
 }
 
 void Nanostate::send_state_update(const string &name, const string &data)
@@ -35,7 +35,7 @@ void Nanostate::send_state_update(const string &name, const string &data)
   const string &str = buffer.str();
   int nbytes = nn_send(_sock, str.c_str(), str.length(), 0);
   if (nbytes < 0)
-    fprintf(stderr, "nn_send %s\n", nn_strerror(errno));
+    fprintf(stderr, "nn_send failed: %s\n", nn_strerror(errno));
 }
 
 void Nanostate::recv_state_update(string &sender, string &name, string &data)
@@ -63,12 +63,13 @@ bool Nanostate::has_state_update()
   struct nn_pollfd pfd[1];
   pfd[0].fd = _sock;
   pfd[0].events = NN_POLLIN;
-  int rc = nn_poll(pfd, 1, 1000);
+  int rc = nn_poll(pfd, 1, 0);
   if (rc < 0)
   {
-    fprintf(stderr, "nn_poll %s\n", nn_strerror(errno));
+    fprintf(stderr, "nn_poll failed: %s\n", nn_strerror(errno));
     return false;
   }
+// fprintf(stderr, "identity %s: %d\n", _identity.c_str(), pfd[0].revents && NN_POLLIN);
   return (pfd[0].revents && NN_POLLIN);
 }
 

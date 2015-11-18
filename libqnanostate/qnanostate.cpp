@@ -5,7 +5,7 @@
 using std::string;
 
 QNanostate::QNanostate(const char *identity, const char *addr)
-  : Nanostate(identity, addr), _interval(20000)
+  : Nanostate(identity, addr), _interval(10)
 {
 }
 
@@ -17,12 +17,11 @@ void QNanostate::run()
 {
   while (true)
   {
-    usleep(_interval / 2);
+    msleep(_interval);
     if (has_state_update())
     {
       emit state_updated();
     }
-    usleep(_interval / 2);
   }
 }
 
