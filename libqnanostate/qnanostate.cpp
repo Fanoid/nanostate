@@ -7,6 +7,7 @@ using std::string;
 QNanostate::QNanostate(const char *identity, const char *addr)
   : Nanostate(identity, addr), _interval(10)
 {
+  qRegisterMetaType<std::string>("std::string");
 }
 
 QNanostate::~QNanostate()
@@ -15,13 +16,13 @@ QNanostate::~QNanostate()
 
 void QNanostate::run()
 {
+  string sender, name, data;
   while (true)
   {
     msleep(_interval);
-    if (has_state_update())
+    if (recv_state_update(sender, name, data))
     {
-//      printf("state updated\n");  // Without this, the program will stuck. TODO
-      emit state_updated();
+      emit state_updated(sender, name, data);
     }
   }
 }

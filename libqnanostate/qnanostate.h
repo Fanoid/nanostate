@@ -3,7 +3,13 @@
 
 #include "libnanostate/nanostate.h"
 
+#include <string>
+
+#include <QMetaType>
 #include <QThread>
+
+Q_DECLARE_METATYPE(std::string)
+
 
 class QNanostate : public QThread, public Nanostate
 {
@@ -15,7 +21,7 @@ public:
 protected:
     void run();
 signals:
-    void state_updated();
+    void state_updated(const std::string &, const std::string &, const std::string &);
 private:
     int _interval;
 };

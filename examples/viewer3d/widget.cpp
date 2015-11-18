@@ -18,25 +18,21 @@ CGLWidget::~CGLWidget()
 void CGLWidget::set_nanostate(QNanostate *nanostate)
 {
   _nanostate = nanostate;  
-  connect(nanostate, SIGNAL(state_updated()), this, SLOT(update_state()));
+  connect(nanostate, SIGNAL(state_updated(const std::string &, const std::string &, const std::string &)), this, SLOT(update_state(const std::string &,const std::string &,const std::string &)));
 }
 
-void CGLWidget::update_state()
+void CGLWidget::update_state(const string &sender, const string &name, const string &data)
 {
-  bool updated = false;
-
-  string sender, name, data;
-  _nanostate->recv_state_update(sender, name, data);
   if (sender == _nanostate->get_identity()) return;
 
+  bool updated = false;
   if (name == "trackball") {
     updated |= _trackball.unserialize(data);
   } else if (name == "tf") {
     fprintf(stderr, "tf = %s\n", data.c_str()); 
   }
 
-  if (updated) 
-    updateGL(); 
+  if (updated) updateGL(); 
 }
 
 void CGLWidget::mousePressEvent(QMouseEvent* e)

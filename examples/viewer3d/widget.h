@@ -18,7 +18,7 @@ public:
   void set_nanostate(QNanostate *nanostate); 
 
 protected slots: 
-  void update_state();
+  void update_state(const std::string &, const std::string &, const std::string &);
 
 protected:
   void initializeGL(); 
