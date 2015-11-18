@@ -18,6 +18,9 @@ Nanostate::Nanostate(const char *identity, const char *addr)
     fprintf(stderr, "nn_socket failed: %s\n", nn_strerror(errno));
   if (nn_connect(_sock, addr) < 0)
     fprintf(stderr, "nn_bind failed: %s\n", nn_strerror(errno));
+
+  int rcvtimeo = 50;
+  nn_setsockopt(_sock, NN_SOL_SOCKET, NN_RCVTIMEO, &rcvtimeo, sizeof(rcvtimeo));
 }
 
 Nanostate::~Nanostate()
@@ -42,6 +45,7 @@ void Nanostate::recv_state_update(string &sender, string &name, string &data)
 {
   char *buf = NULL;
   int nbytes = nn_recv(_sock, &buf, NN_MSG, 0);
+  fprintf(stderr, "nbytes = %d\n", nbytes);
   if (nbytes > 0)
   {
     msgpack::unpacked result;
@@ -54,8 +58,9 @@ void Nanostate::recv_state_update(string &sender, string &name, string &data)
     sender = dst.get<0>();
     name = dst.get<1>();
     data = dst.get<2>();
+
+    nn_freemsg(buf);
   }
-  nn_freemsg(buf);
 }
 
 bool Nanostate::has_state_update()
@@ -64,6 +69,7 @@ bool Nanostate::has_state_update()
   pfd[0].fd = _sock;
   pfd[0].events = NN_POLLIN;
   int rc = nn_poll(pfd, 1, 0);
+  fprintf(stderr, "rc = %d\n", rc);
   if (rc < 0)
   {
     fprintf(stderr, "nn_poll failed: %s\n", nn_strerror(errno));
