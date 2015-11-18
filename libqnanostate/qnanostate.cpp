@@ -20,6 +20,7 @@ void QNanostate::run()
     msleep(_interval);
     if (has_state_update())
     {
+      printf("state updated\n");  // Without this, the program will stuck. TODO
       emit state_updated();
     }
   }
