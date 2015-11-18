@@ -9,8 +9,8 @@ public:
   explicit Nanostate(const char *identity, const char *addr);
   ~Nanostate();
 public:
-  void send_state_update(const std::string &name, const std::string &data);
-  void recv_state_update(std::string &sender, std::string &name, std::string &data);
+  bool send_state_update(const std::string &name, const std::string &data);
+  bool recv_state_update(std::string &sender, std::string &name, std::string &data);
   bool has_state_update();
   const std::string &get_identity() const { return _identity; }
 protected:

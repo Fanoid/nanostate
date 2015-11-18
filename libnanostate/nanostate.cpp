@@ -29,7 +29,7 @@ Nanostate::~Nanostate()
     fprintf(stderr, "nn_shutdown failed: %s\n", nn_strerror(errno));
 }
 
-void Nanostate::send_state_update(const string &name, const string &data)
+bool Nanostate::send_state_update(const string &name, const string &data)
 {
   msgpack::type::tuple<string, string, string> src(_identity, name, data);
   stringstream buffer;
@@ -37,30 +37,36 @@ void Nanostate::send_state_update(const string &name, const string &data)
 
   const string &str = buffer.str();
   int nbytes = nn_send(_sock, str.c_str(), str.length(), 0);
-  if (nbytes < 0)
-    fprintf(stderr, "nn_send failed: %s\n", nn_strerror(errno));
+  if (nbytes < 0) // -1
+  {
+//    fprintf(stderr, "nn_send failed: %s\n", nn_strerror(errno));
+    return false;
+  }
+  return true;
 }
 
-void Nanostate::recv_state_update(string &sender, string &name, string &data)
+bool Nanostate::recv_state_update(string &sender, string &name, string &data)
 {
   char *buf = NULL;
   int nbytes = nn_recv(_sock, &buf, NN_MSG, 0);
-  fprintf(stderr, "nbytes = %d\n", nbytes);
-  if (nbytes > 0)
+  if (nbytes < 0) // -1
   {
-    msgpack::unpacked result;
-    msgpack::unpack(result, buf, nbytes);
-
-    msgpack::object deserialized = result.get();
-    msgpack::type::tuple<string, string, string> dst;
-    deserialized.convert(&dst);
-
-    sender = dst.get<0>();
-    name = dst.get<1>();
-    data = dst.get<2>();
-
-    nn_freemsg(buf);
+//    fprintf(stderr, "nn_recv failed: %s\n", nn_strerror(errno));
+    return false;
   }
+  msgpack::unpacked result;
+  msgpack::unpack(result, buf, nbytes);
+
+  msgpack::object deserialized = result.get();
+  msgpack::type::tuple<string, string, string> dst;
+  deserialized.convert(&dst);
+
+  sender = dst.get<0>();
+  name = dst.get<1>();
+  data = dst.get<2>();
+
+  nn_freemsg(buf);
+  return true;
 }
 
 bool Nanostate::has_state_update()
@@ -69,13 +75,16 @@ bool Nanostate::has_state_update()
   pfd[0].fd = _sock;
   pfd[0].events = NN_POLLIN;
   int rc = nn_poll(pfd, 1, 0);
-  fprintf(stderr, "rc = %d\n", rc);
-  if (rc < 0)
+  if (rc == 0)
   {
-    fprintf(stderr, "nn_poll failed: %s\n", nn_strerror(errno));
+//    fprintf(stderr, "nn_poll timeout.\n");
     return false;
   }
-// fprintf(stderr, "identity %s: %d\n", _identity.c_str(), pfd[0].revents && NN_POLLIN);
-  return (pfd[0].revents && NN_POLLIN);
+  if (rc < 0) // -1
+  {
+//    fprintf(stderr, "nn_poll failed: %s\n", nn_strerror(errno));
+    return false;
+  }
+  return (pfd[0].revents & NN_POLLIN);
 }
 
