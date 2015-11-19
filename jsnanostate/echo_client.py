@@ -1,30 +1,20 @@
 # -*- coding: utf-8 -*-
 from ws4py.client.threadedclient import WebSocketClient
+import msgpack
 
 class EchoClient(WebSocketClient):
-    def opened(self):
-        def data_provider():
-            for i in range(1, 200, 25):
-                yield "#" * i
-                
-        self.send(data_provider())
-
-        for i in range(0, 200, 25):
-            print(i)
-            self.send("*" * i)
-
-    def closed(self, code, reason):
-        print(("Closed down", code, reason))
-
     def received_message(self, m):
-        print("=> %d %s" % (len(m), str(m)))
-#        if len(m) == 175:
-#            self.close(reason='Bye bye')
+        print(type(m))
+        if (m.is_binary):
+            buf = m.data
+            state = msgpack.unpackb(buf, use_list = False)
+            print(state)
+        else:
+            print(str(m))
 
 if __name__ == '__main__':
     try:
         ws = EchoClient('ws://127.0.0.1:9000/ws', protocols=['http-only', 'chat'])
-#        ws.daemon = False
         ws.connect()
         ws.run_forever()
     except KeyboardInterrupt:
