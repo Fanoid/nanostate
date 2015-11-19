@@ -28,6 +28,7 @@ class Root(object):
     <head>
       <script type='application/javascript' src='/js/jquery.min.js'></script>
       <script type='application/javascript' src='/js/msgpack.min.js'></script>
+      <script type='application/javascript' src='/js/nanostate.js'></script>
       <script type='application/javascript'>
         $(document).ready(function() {
 
@@ -52,29 +53,28 @@ class Root(object):
             e.stopPropagation();
             e.preventDefault();
           };
-          ws.onmessage = function (evt) {
-             if (typeof(evt.data) === "string")
+          ws.onmessage = function (e) {
+             if (typeof(e.data) === "string")
              {
-                $('#chat').val($('#chat').val() + evt.data + '\\n');
+                $('#chat').val($('#chat').val() + e.data + '\\n');
              }
              else
              {
-                buf = new Uint8Array(evt.data)
-                state = msgpack.decode(buf)
-                $('#chat').val($('#chat').val() + 'state: ' + state + '\\n');
+                state = recv_state_update(e.data);
+                $('#chat').val($('#chat').val() + 'state: ' + 
+                JSON.stringify(state) + '\\n');
              }
           };
           ws.onopen = function() {
              ws.send("%(username)s entered the room");
           };
-          ws.onclose = function(evt) {
-             $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\\n');
+          ws.onclose = function(e) {
+             $('#chat').val($('#chat').val() + 'Connection closed by server: ' + e.code + ' \"' + e.reason + '\"\\n');
           };
 
           $('#send').click(function() {
              ws.send('%(username)s: ' + $('#message').val());
-             buf = msgpack.encode(['Hello', 'World'])
-             ws.send(buf)
+             send_state_update(ws, '%(username)s', 'Hello', $('#message').val());
              $('#message').val("");
              return false;
           });
