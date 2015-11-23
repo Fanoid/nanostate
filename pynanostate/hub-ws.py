@@ -12,13 +12,13 @@ import argparse
 parser = argparse.ArgumentParser(description="A nanostate hub with router between websocket written by Python.")
 parser.add_argument('--bind', '-B', dest = "addr", required = True, help = "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'")
 
-parser.add_argument("--ws_addr", dest = "ws_addr", required = True, help = "The address to bind websocket server, such as 127.0.0.1")
+parser.add_argument("--ws_host", dest = "ws_host", required = True, help = "The address to bind websocket server, such as 127.0.0.1")
 parser.add_argument("--ws_port", dest = "ws_port", type=int, required = True, help = "The port to bind websocket server, such as 15001")
 
 args = parser.parse_args()
 print(args)
 addr = args.addr
-ws_addr = args.ws_addr
+ws_host = args.ws_host
 ws_port = args.ws_port
 
 class WebSocketHandler(WebSocket):
@@ -48,12 +48,12 @@ class Root:
 
 # Initialize websocket hub
 cherrypy.config.update({
-    'server.socket_host': ws_addr,
+    'server.socket_host': ws_host,
     'server.socket_port': ws_port})
 WebSocketPlugin(cherrypy.engine).subscribe()
 cherrypy.tools.websocket = WebSocketTool()
 
-cherrypy.tree.mount(Root(ws_addr, ws_port), "/", config={
+cherrypy.tree.mount(Root(ws_host, ws_port), "/", config={
     '/ws': {
         'tools.websocket.on': True,
         'tools.websocket.handler_cls': WebSocketHandler
