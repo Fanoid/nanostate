@@ -66,6 +66,7 @@ void CGLWidget::resizeGL(int w, int h)
 
 void CGLWidget::paintGL()
 {
+  glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
   glClearColor(0, 0, 0, 0); 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
@@ -78,17 +79,8 @@ void CGLWidget::paintGL()
   
   _trackball.applyTransform(); 
 
-  glColor3f(1, 1, 1); 
-  glBegin(GL_LINE_STRIP);
-  glVertex3f(0.1, 0.1, 0.1);
-  glVertex3f(0.1, 0.1, 0.9);
-  glVertex3f(0.1, 0.9, 0.9);
-  glVertex3f(0.1, 0.9, 0.1);
-  glVertex3f(0.9, 0.9, 0.1);
-  glVertex3f(0.9, 0.9, 0.9);
-  glVertex3f(0.9, 0.1, 0.9);
-  glVertex3f(0.9, 0.1, 0.1);
-  glEnd();
-//  glutWireTeapot(0.6); 
+//  glutWireTeapot(0.6);  // This is broken.
+  GLUquadric *quad = gluNewQuadric();
+  gluCylinder(quad, 0.5, 0.2, 0.7, 50, 25);
 }
 
