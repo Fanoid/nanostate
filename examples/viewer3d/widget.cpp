@@ -30,6 +30,8 @@ void CGLWidget::update_state(const string &sender, const string &name, const str
     updated |= _trackball.unserialize(data);
   } else if (name == "tf") {
     fprintf(stderr, "tf = %s\n", data.c_str()); 
+  } else {
+    fprintf(stderr, "identity = %s, name = %s, data = %s\n", sender.c_str(), name.c_str(), data.c_str());
   }
 
   if (updated) updateGL(); 

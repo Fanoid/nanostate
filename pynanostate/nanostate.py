@@ -4,6 +4,7 @@ import nanomsg
 import msgpack
 import sys
 import time
+import argparse
 
 class Nanostate:
     def __init__(self, identity, addr):
@@ -13,9 +14,11 @@ class Nanostate:
         self._identity = identity
 
     def send_state_update(self, name, data):
-        buf = msgpack.packb((self._identity, name, data))
+        state = (self._identity, name, data)
+        buf = msgpack.packb(state)
         try:
             self._sock.send(buf)
+            print(self._identity + " sent: " + str(state))
             return True
         except NanoMsgError:
             return False
@@ -25,15 +28,29 @@ class Nanostate:
         try:
             buf = self._sock.recv()
             state = msgpack.unpackb(buf, use_list = False)
-            return (True, state)
+            if state[0].decode() != self._identity:
+                print(self._identity + " received: " + str(state))
+                return (True, state)
+            else:
+                return (False, state)
         except NanoMsgError:
             return (False, state)
 
 if __name__ == "__main__":
-    nanostate = Nanostate(sys.argv[1], sys.argv[2])
+
+    parser = argparse.ArgumentParser(description="A nanostate client written by Python.")
+    parser.add_argument('--identity', '-I', dest = "identity", required = True, help = "A string to identiy this client")
+    parser.add_argument('--connect', '-C', dest = "addr", required = True, help = "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'")
+
+    args = parser.parse_args()
+    print(args)
+    identity = args.identity
+    addr = args.addr
+
+    nanostate = Nanostate(identity, addr)
     while True:
         time.sleep(1)
         nanostate.send_state_update("Hello", "World")
         result, state = nanostate.recv_state_update()
-        if result:
-            print(state)
+#        if result:
+#            print(sys.argv[1] + " received: " + str(state))

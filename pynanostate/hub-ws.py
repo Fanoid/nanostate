@@ -23,7 +23,7 @@ ws_port = args.ws_port
 
 class WebSocketHandler(WebSocket):
     def received_message(self, msg):
-        print("WebSocket received: " + str(msg))
+#        print("WebSocket received: " + repr(msg))
         cherrypy.engine.publish('websocket-broadcast', msg)
 
         if (msg.is_binary):
@@ -73,9 +73,10 @@ print("Nanostate socket bound to " + addr)
 print("Starting nanostate hub")
 while True:
     buf = sock.recv()
-    print("nanostate received: " + str(buf))
+#    print("nanostate hub received: " + repr(buf))
     sock.send(buf)
-    cherrypy.engine.publish('websocket-broadcast', buf)
+    cherrypy.engine.publish('websocket-broadcast', buf, binary = True)
+#    print("WebSocket hub sent: " + repr(buf))
 
 sock.close()
 cherrypy.engine.stop()

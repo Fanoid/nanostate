@@ -5,22 +5,10 @@ import os
 
 import cherrypy
 
-from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
-from ws4py.websocket import WebSocket
-from ws4py.messaging import TextMessage
-
-class ChatWebSocketHandler(WebSocket):
-    def received_message(self, m):
-        cherrypy.engine.publish('websocket-broadcast', m)
-
-    def closed(self, code, reason="A client left the room without a proper explanation."):
-        cherrypy.engine.publish('websocket-broadcast', TextMessage(reason))
-
 class Root(object):
-    def __init__(self, host, port, ssl=False):
-        self.host = host
-        self.port = port
-        self.scheme = 'wss' if ssl else 'ws'
+    def __init__(self, ws_host, ws_port):
+        self.ws_host = ws_host
+        self.ws_port = ws_port
 
     @cherrypy.expose
     def index(self):
@@ -31,8 +19,9 @@ class Root(object):
       <script type='application/javascript' src='/js/nanostate.js'></script>
       <script type='application/javascript'>
         $(document).ready(function() {
+          identity = "%(username)s"
 
-          websocket = '%(scheme)s://%(host)s:%(port)s/ws';
+          websocket = 'ws://%(ws_host)s:%(ws_port)s/ws';
           if (window.WebSocket) {
             ws = new WebSocket(websocket);
           }
@@ -66,14 +55,11 @@ class Root(object):
              }
           };
           ws.onopen = function() {
-             ws.send("%(username)s entered the room");
           };
           ws.onclose = function(e) {
-             $('#chat').val($('#chat').val() + 'Connection closed by server: ' + e.code + ' \"' + e.reason + '\"\\n');
           };
 
           $('#send').click(function() {
-             ws.send('%(username)s: ' + $('#message').val());
              send_state_update(ws, '%(username)s', 'Hello', $('#message').val());
              $('#message').val("");
              return false;
@@ -83,46 +69,28 @@ class Root(object):
     </head>
     <body>
     <form action='#' id='chatform' method='get'>
-      <textarea id='chat' cols='35' rows='10'></textarea>
+      <textarea id='chat' cols='80' rows='40'></textarea>
       <br />
       <label for='message'>%(username)s: </label><input type='text' id='message' />
       <input id='send' type='submit' value='Send' />
       </form>
     </body>
     </html>
-    """ % {'username': "User%d" % random.randint(0, 100), 'host': self.host, 'port': self.port, 'scheme': self.scheme}
-
-    @cherrypy.expose
-    def ws(self):
-        cherrypy.log("Handler created: %s" % repr(cherrypy.request.ws_handler))
+    """ % {'username': "User%d" % random.randint(0, 100), 'ws_host': self.ws_host, 'ws_port': self.ws_port}
 
 if __name__ == '__main__':
-    import logging
-    from ws4py import configure_logger
-    configure_logger(level=logging.DEBUG)
-
-    parser = argparse.ArgumentParser(description='Echo CherryPy Server')
-    parser.add_argument('--host', default='127.0.0.1')
-    parser.add_argument('-p', '--port', default=9000, type=int)
-    parser.add_argument('--ssl', action='store_true')
+    parser = argparse.ArgumentParser(description='A web server writting by Python CherryPy, which will connect to a WebSocket server')
+    parser.add_argument("--http_host", dest = "http_host", required = True, help = "The host to host a web server")
+    parser.add_argument("--http_port", dest = "http_port", required = True, type=int, help = "The port to host a web server")
+    parser.add_argument("--ws_host", dest = "ws_host", required = True, help = "The host of the websocket server, such as 127.0.0.1")
+    parser.add_argument("--ws_port", dest = "ws_port", type=int, required = True, help = "The port of the websocket server, such as 15001")
     args = parser.parse_args()
 
-    cherrypy.config.update({'server.socket_host': args.host,
-                            'server.socket_port': args.port,
+    cherrypy.config.update({'server.socket_host': args.http_host,
+                            'server.socket_port': args.http_port,
                             'tools.staticdir.root': os.path.abspath(os.path.dirname(__file__))})
 
-    if args.ssl:
-        cherrypy.config.update({'server.ssl_certificate': './server.crt',
-                                'server.ssl_private_key': './server.key'})
-
-    WebSocketPlugin(cherrypy.engine).subscribe()
-    cherrypy.tools.websocket = WebSocketTool()
-
-    cherrypy.quickstart(Root(args.host, args.port, args.ssl), '', config={
-        '/ws': {
-            'tools.websocket.on': True,
-            'tools.websocket.handler_cls': ChatWebSocketHandler
-            },
+    cherrypy.quickstart(Root(args.ws_host, args.ws_port), '', config={
         '/js': {
               'tools.staticdir.on': True,
               'tools.staticdir.dir': 'js'
