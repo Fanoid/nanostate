@@ -23,10 +23,10 @@ link_directories (
   ${PROJECT_BINARY_DIR}/lib
 )
 
-subdirs (libnanostate examples)
+subdirs (cnanostate examples)
 
 if (ENABLE_QT) 
-  subdirs (libqnanostate)
+  subdirs (qtnanostate)
   set (CMAKE_AUTOMOC TRUE)
   if (ENABLE_QT_EXAMPLES)
     find_package (Qt4 COMPONENTS QtCore QtGui QtOpenGL)

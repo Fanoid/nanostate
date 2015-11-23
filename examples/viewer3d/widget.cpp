@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <GL/glut.h>
 #include "widget.h"
-#include "libqnanostate/qnanostate.h"
+#include "qtnanostate/qnanostate.h"
 
 using namespace std; 
 

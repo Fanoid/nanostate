@@ -1,7 +1,7 @@
 #ifndef _QNANOSTATE_H_
 #define _QNANOSTATE_H_
 
-#include "libnanostate/nanostate.h"
+#include "cnanostate/nanostate.h"
 
 #include <string>
 

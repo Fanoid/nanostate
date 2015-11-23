@@ -1,6 +1,6 @@
 #include "widget.h"
 
-#include "libqnanostate/qnanostate.h"
+#include "qtnanostate/qnanostate.h"
 
 #include <stdio.h>
 #include <QApplication>
