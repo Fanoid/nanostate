@@ -72,7 +72,7 @@ class Root(object):
       <textarea id='chat' cols='80' rows='40'></textarea>
       <br />
       <label for='message'>%(username)s: </label><input type='text' id='message' />
-      <input id='send' type='submit' value='Send' />
+      <input id='send' type='submit' value='Send State' />
       </form>
     </body>
     </html>
