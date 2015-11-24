@@ -12,8 +12,8 @@ set (CMAKE_MODULE_PATH
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-option (ENABLE_QT "Enable QT" OFF)
-option (ENABLE_QT_EXAMPLES "Enable QT Examples" OFF)
+option (ENABLE_QT "Enable QT" ON)
+option (ENABLE_QT_EXAMPLES "Enable QT Examples" ON)
 
 include_directories (
   ${PROJECT_SOURCE_DIR}
