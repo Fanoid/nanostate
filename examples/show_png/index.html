@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <script type='application/javascript' src='/js/jquery.min.js'></script>
+    <script type='application/javascript' src='/js/msgpack.min.js'></script>
+    <script type='application/javascript' src='/js/nanostate.js'></script>
+    <script type='application/javascript'>
+// public method for encoding an Uint8Array to base64
+function encode (input) {
+    var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var output = "";
+    var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+    var i = 0;
+
+    while (i < input.length) {
+        chr1 = input[i++];
+        chr2 = i < input.length ? input[i++] : Number.NaN; // Not sure if the index 
+        chr3 = i < input.length ? input[i++] : Number.NaN; // checks are needed here
+
+        enc1 = chr1 >> 2;
+        enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+        enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+        enc4 = chr3 & 63;
+
+        if (isNaN(chr2)) {
+            enc3 = enc4 = 64;
+        } else if (isNaN(chr3)) {
+            enc4 = 64;
+        }
+        output += keyStr.charAt(enc1) + keyStr.charAt(enc2) +
+                  keyStr.charAt(enc3) + keyStr.charAt(enc4);
+    }
+    return output;
+}
+
+var host = '127.0.0.1'
+var port = 15001
+var identity = 'web'
+var socket = new WebSocket('ws://'+host+':'+port+'/ws');
+socket.binaryType = 'arraybuffer';
+
+try {
+  socket.onopen = function() {
+    document.getElementById('status').style.backgroundColor = '#40ff40';
+    document.getElementById('status').textContent = 'Connection opened';
+  }
+
+  socket.onmessage = function(msg) {
+    console.log("msg received")
+    var state = recv_state_update(msg.data);
+    if (state.sender == identity) return;
+    if (state.name == "image")
+    {
+      var image = document.getElementById('image');
+      // state.data already in base64 format
+      image.src = 'data:image/png;base64,' + state.data;
+    }
+  }
+
+  socket.onclose = function(){
+    document.getElementById('status').style.backgroundColor = '#ff4040';
+    document.getElementById('status').textContent = 'Connection closed';
+  }
+} catch(exception) {
+  alert('Error:'+exception);
+}
+    </script>
+  </head>
+  <body>
+    <div id='status'></div>
+    <img id='image'></img>
+  </body>
+</html>
+

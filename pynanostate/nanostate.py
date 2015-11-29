@@ -11,6 +11,9 @@ class Nanostate:
         self._sock = Socket(BUS)
         self._sock.connect(addr)
         self._sock.recv_timeout = 50
+        self._sock.send_buffer_size = 1024 * 1024 * 1024
+        self._sock.recv_buffer_size = 1024 * 1024 * 1024
+        self._sock.set_int_option(SOL_SOCKET, RCVMAXSIZE, -1)
         self._identity = identity
 
     def send_state_update(self, name, data):
@@ -18,7 +21,7 @@ class Nanostate:
         buf = msgpack.packb(state)
         try:
             self._sock.send(buf)
-            print(self._identity + " sent: " + str(state))
+#            print(self._identity + " sent: " + str(state))
             return True
         except NanoMsgError:
             return False
@@ -53,4 +56,4 @@ if __name__ == "__main__":
         nanostate.send_state_update("Hello", "World")
         result, state = nanostate.recv_state_update()
 #        if result:
-#            print(sys.argv[1] + " received: " + str(state))
+#            print(identity + " received: " + str(state))

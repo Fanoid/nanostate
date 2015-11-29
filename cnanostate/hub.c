@@ -16,7 +16,7 @@ int main (const int argc, const char **argv)
 
   if (addr == NULL)
   {
-    fprintf(stderr, "Usage: %s --i IDENTITY -c ADDR\n", argv[0]);
+    fprintf(stderr, "Usage: %s -b ADDR\n", argv[0]);
     fprintf(stderr, "ADDR is the address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'\n");
     return 1;
   }
