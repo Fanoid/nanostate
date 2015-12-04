@@ -10,6 +10,9 @@ addr = args.addr
 
 sock = Socket(BUS)
 sock.bind(args.addr)
+sock.send_buffer_size = 1024 * 1024 * 1024
+sock.recv_buffer_size = 1024 * 1024 * 1024
+sock.set_int_option(SOL_SOCKET, RCVMAXSIZE, -1)
 print("Socket bound to " + addr)
 
 while True:
