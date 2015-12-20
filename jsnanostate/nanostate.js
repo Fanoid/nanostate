@@ -15,11 +15,13 @@ function recv_state_update(buf)
   return info;
 }
 
-function start_websocket(identity, ws_host, ws_port, ws_path, onmessage_callback)
+function start_websocket(identity, ws_host, ws_port, ws_path, onmessage_callback, onopen_callback, onclose_callback)
 {
     ws = new WebSocket("ws://" + ws_host + ":" + ws_port + ws_path);
     ws.identity = identity;
     ws.binaryType = "arraybuffer";
     ws.onmessage = onmessage_callback;
+    ws.onopen = onopen_callback;
+    ws.onclose = onclose_callback;
     return ws;
 }

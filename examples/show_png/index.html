@@ -1,8 +1,8 @@
 <html>
   <head>
-    <script type='application/javascript' src='/js/jquery.min.js'></script>
-    <script type='application/javascript' src='/js/msgpack.min.js'></script>
-    <script type='application/javascript' src='/js/nanostate.js'></script>
+    <script type='application/javascript' src='js/jquery.min.js'></script>
+    <script type='application/javascript' src='js/msgpack.min.js'></script>
+    <script type='application/javascript' src='js/nanostate.js'></script>
     <script type='application/javascript'>
 // public method for encoding an Uint8Array to base64
 function encode (input) {
@@ -32,7 +32,7 @@ function encode (input) {
     return output;
 }
 
-var host = '127.0.0.1'
+var host = "192.168.40.13"
 var port = 15001
 var identity = 'web'
 var socket = new WebSocket('ws://'+host+':'+port+'/ws');
