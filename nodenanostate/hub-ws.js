@@ -38,13 +38,14 @@ sock.bind(addr);
 sock.sndbuf(1024 * 1024 * 1024);
 sock.rcvbuf(1024 * 1024 * 1024);
 sock.rcvmaxsize(-1);
-console.log("Nanostate socket bound to " + addr);
+console.log("Socket bound to " + addr);
 
 var wss = new WebSocketServer({
   host: ws_host,
   port: ws_port,
   path: "/ws"
 });
+console.log("WebSocket bound to " + ws_host + ":" + ws_port);
 
 wss.broadcast = function broadcast(data) {
   wss.clients.forEach(function each(client) {
@@ -53,16 +54,16 @@ wss.broadcast = function broadcast(data) {
 };
 
 wss.on('connection', function connection(ws) {
-  console.log("1 client connected.");
+  console.log("1 new client connected.");
   ws.on('message', function(data, flags) {
-    console.log('ws received: %s', data);
+//    console.log('ws received: %s', data);
     wss.broadcast(data);
     sock.send(data);
   });
 });
 
 sock.on('data', function (buf) {
-  console.log('ws received: %s', buf);
+//  console.log('ws received: %s', buf);
   sock.send(buf);
   wss.broadcast(buf);
 });
