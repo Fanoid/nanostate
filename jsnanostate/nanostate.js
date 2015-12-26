@@ -20,8 +20,8 @@ function start_websocket(identity, ws_host, ws_port, ws_path, onmessage_callback
     ws = new WebSocket("ws://" + ws_host + ":" + ws_port + ws_path);
     ws.identity = identity;
     ws.binaryType = "arraybuffer";
-    ws.onmessage = onmessage_callback;
-    ws.onopen = onopen_callback;
-    ws.onclose = onclose_callback;
+    if (onmessage_callback != null) ws.onmessage = onmessage_callback;
+    if (onopen_callback != null) ws.onopen = onopen_callback;
+    if (onclose_callback != null) ws.onclose = onclose_callback;
     return ws;
 }
