@@ -18,7 +18,7 @@ int main(int argc, const char **argv)
   }
   if ((identity == "") || (addr == ""))
   {
-    fprintf(stderr, "Usage: %s --i IDENTITY -c ADDR\n", argv[0]);
+    fprintf(stderr, "Usage: %s -i IDENTITY -c ADDR\n", argv[0]);
     fprintf(stderr, "IDENTITY is a string to identify this client\n");
     fprintf(stderr, "ADDR is the address of the server, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'\n");
     return 1;

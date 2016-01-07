@@ -1,0 +1,80 @@
+<html>
+  <head>
+    <script type='application/javascript' src='/js/jquery.min.js'></script>
+    <script type='application/javascript' src='/js/msgpack.min.js'></script>
+    <script type='application/javascript' src='/js/nanostate.js'></script>
+    <script type='application/javascript'>
+function GetURLParameter(sParam, sDefault){
+  var sPageURL = window.location.search.substring(1);
+  var sURLVariables = sPageURL.split('&');
+  for (var i = 0; i < sURLVariables.length; i++) 
+  {
+    var sParameterName = sURLVariables[i].split('=');
+    if (sParameterName[0] == sParam) 
+      return sParameterName[1];
+  }
+  return sDefault;
+}
+
+$(document).ready(function() {
+  var identity = GetURLParameter("identity", "html");
+  var ws_host = GetURLParameter("ws_host", "127.0.0.1");
+  var ws_port = GetURLParameter("ws_port", "15001");
+
+  websocket = 'ws://' + ws_host + ':' + ws_port + '/ws';
+  if (window.WebSocket) {
+    ws = new WebSocket(websocket);
+  }
+  else if (window.MozWebSocket) {
+    ws = MozWebSocket(websocket);
+  }
+  else {
+    console.log('WebSocket Not Supported');
+    return;
+  }
+  ws.binaryType = 'arraybuffer';
+
+  window.onbeforeunload = function(e) {
+    $('#chat').val($('#chat').val() + 'Bye bye...\\n');
+    ws.close(1000, identity + ' left the room');
+
+    if(!e) e = window.event;
+    e.stopPropagation();
+    e.preventDefault();
+  };
+  ws.onmessage = function (e) {
+    if (typeof(e.data) === "string")
+    {
+      $('#chat').val($('#chat').val() + e.data + '\\n');
+    }
+    else
+    {
+      state = recv_state_update(e.data);
+      $('#chat').val($('#chat').val() + 'state: ' + 
+          JSON.stringify(state) + '\\n');
+    }
+  };
+  ws.onopen = function() {
+  };
+  ws.onclose = function(e) {
+  };
+
+  $('#send').click(function() {
+    send_state_update(ws, identity, 'Hello', $('#message').val());
+    $('#message').val("");
+    return false;
+  });
+
+  $('#identity').text(identity + ": ");
+});
+    </script>
+  </head>
+  <body>
+    <form action='#' id='chatform' method='get'>
+      <textarea id='chat' cols='80' rows='40'></textarea>
+      <br />
+      <label id='identity' for='message'>identity: </label><input type='text' id='message' />
+      <input id='send' type='submit' value='Send State' />
+    </form>
+  </body>
+</html>
