@@ -6,8 +6,10 @@
 #include <msgpack.hpp>
 
 #include <sstream>
+#include <vector>
 
 using std::string;
+using std::vector;
 using std::stringstream;
 
 Nanostate::Nanostate(const char *identity, const char *addr)
@@ -29,16 +31,11 @@ Nanostate::~Nanostate()
     fprintf(stderr, "nn_shutdown failed: %s\n", nn_strerror(errno));
 }
 
-bool Nanostate::send_state_update(const string &name, const string &data)
+bool Nanostate::send_state_update(const string &name, const vector<char> &data)
 {
   stringstream buffer;
-  msgpack::packer<stringstream> packer(buffer);
-
-  packer.pack_array(3);
-  packer.pack(_identity);
-  packer.pack(name);
-  packer.pack_bin(data.length());
-  packer.pack_bin_body(data.c_str(), data.length());
+  msgpack::type::tuple<string, string, vector<char> > src(_identity, name, data);
+  msgpack::pack(buffer, src);
 
   const string &str = buffer.str();
   int nbytes = nn_send(_sock, str.c_str(), str.length(), 0);
@@ -50,7 +47,13 @@ bool Nanostate::send_state_update(const string &name, const string &data)
   return true;
 }
 
-bool Nanostate::recv_state_update(string &sender, string &name, string &data)
+bool Nanostate::send_state_update(const string &name, const string &data)
+{
+  const char *ptr = data.c_str();
+  return send_state_update(name, vector<char>(ptr, ptr + data.length()));
+}
+
+bool Nanostate::recv_state_update(string &sender, string &name, vector<char> &data)
 {
   char *buf = NULL;
   int nbytes = nn_recv(_sock, &buf, NN_MSG, 0);
@@ -63,7 +66,7 @@ bool Nanostate::recv_state_update(string &sender, string &name, string &data)
   msgpack::unpack(result, buf, nbytes);
 
   msgpack::object deserialized = result.get();
-  msgpack::type::tuple<string, string, string> dst;
+  msgpack::type::tuple<string, string, vector<char> > dst;
   deserialized.convert(&dst);
 
   sender = dst.get<0>();
@@ -72,6 +75,14 @@ bool Nanostate::recv_state_update(string &sender, string &name, string &data)
 
   nn_freemsg(buf);
   return true;
+}
+
+bool Nanostate::recv_state_update(string &sender, string &name, string &data)
+{
+  vector<char> vec;
+  bool ret = recv_state_update(sender, name, vec);
+  data = string(vec.begin(), vec.end());
+  return ret;
 }
 
 bool Nanostate::has_state_update()
