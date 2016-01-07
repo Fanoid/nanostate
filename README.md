@@ -34,4 +34,4 @@ Current implementations and their dependencies are listed as follows.
 Known issues:
 
   1. If you encounter this warning "UserWarning: Could not load the default wrapper for your platform: cpy, performance may be affected!" when running hub-ws.py, please ensure that nanomsg-python is corrected compiled and linked to libnanomsg.so, and libnanomsg.so can be found when running. Or try the Node.js version of Hub-WS.
-  2. Apps communicate by the mean of "state", which is a pair of "name" and "state". Theoritically, the "state" is intended to be a string (in every languages). But actually in JavaScript, any Object can be sent because of poor type check. It will cause C app be crashed.
+  2. Apps communicate by the mean of "state", which is a pair of "name" and "state". Theoretically, the "state" is intended to be a byte array (in every languages). But actually in JavaScript, any Object can be sent because of poor type check. It will cause C App be crashed. You should transform those objects into a byte array by any means (using JSON, MsgPack, ProtoBuf, etc.).
