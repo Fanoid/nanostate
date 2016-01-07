@@ -31,9 +31,14 @@ Nanostate::~Nanostate()
 
 bool Nanostate::send_state_update(const string &name, const string &data)
 {
-  msgpack::type::tuple<string, string, string> src(_identity, name, data);
   stringstream buffer;
-  msgpack::pack(buffer, src);
+  msgpack::packer<stringstream> packer(buffer);
+
+  packer.pack_array(3);
+  packer.pack(_identity);
+  packer.pack(name);
+  packer.pack_bin(data.length());
+  packer.pack_bin_body(data.c_str(), data.length());
 
   const string &str = buffer.str();
   int nbytes = nn_send(_sock, str.c_str(), str.length(), 0);

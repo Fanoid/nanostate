@@ -49,7 +49,7 @@ console.log("WebSocket bound to " + ws_host + ":" + ws_port);
 
 wss.broadcast = function broadcast(data) {
   wss.clients.forEach(function each(client) {
-    client.send(data);
+    client.send(data, { binary: true });
   });
 };
 
@@ -63,7 +63,7 @@ wss.on('connection', function connection(ws) {
 });
 
 sock.on('data', function (buf) {
-//  console.log('ws received: %s', buf);
+//  console.log('sock received: %s', buf);
   sock.send(buf);
   wss.broadcast(buf);
 });
