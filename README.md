@@ -34,8 +34,4 @@ Current implementations and their dependencies are listed as follows.
 Known issues:
 
   1. If you encounter this warning "UserWarning: Could not load the default wrapper for your platform: cpy, performance may be affected!" when running hub-ws.py, please ensure that nanomsg-python is corrected compiled and linked to libnanomsg.so, and libnanomsg.so can be found when running. Or try the Node.js version of Hub-WS.
-<<<<<<< HEAD
-  2. Apps communicate by the mean of "state", which is a pair of "name" and "data". Theoretically, the "data" is intended to be a byte array (in every languages). But actually in JavaScript, any Object can be sent because of poor type check. It will cause C App be crashed. You should transform those objects into a byte array by any means (using JSON, MsgPack, ProtoBuf, etc.).
-=======
-  2. Apps communicate by the mean of "state", which is a pair of "name" and "state". Theoretically, the "state" is intended to be a byte array (in every languages). But actually in JavaScript, any Object can be sent because of poor type check. It will cause C App be crashed. You should transform those objects into a byte array by any means (using JSON, MsgPack, ProtoBuf, etc.).
->>>>>>> 699e1e75d1bca7e86e5f4fd73b5dd9e1f8d95c08
+  2. Apps communicate using the "state", which is a pair of "name" and "data". The "data" is expected to be a byte array (in every languages). Strictly speaking, if you want to send/receive a string, your need to transform it to/from a byte array. To make it a little bit convenient, in C/Python, strings are transformed using UTF-8 encoding in the API, so they can be directly sent/received. But JavaScript can't now. So a safer approach is to transform string using MsgPack in all apps.

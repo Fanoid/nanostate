@@ -17,8 +17,9 @@ class Nanostate:
         self._identity = identity
 
     def send_state_update(self, name, data):
+        if (type(data) is str): data = data.encode('utf-8')
         state = (self._identity, name, data)
-        buf = msgpack.packb(state)
+        buf = msgpack.packb(state, use_bin_type = True)
         try:
             self._sock.send(buf)
 #            print(self._identity + " sent: " + str(state))
@@ -30,9 +31,9 @@ class Nanostate:
         state = None
         try:
             buf = self._sock.recv()
-            state = msgpack.unpackb(buf, use_list = False)
-            if state[0].decode() != self._identity:
-                print(self._identity + " received: " + str(state))
+            state = msgpack.unpackb(buf, use_list = False, encoding = 'utf-8')
+            if state[0] != self._identity:
+#                print(self._identity + " received: " + str(state))
                 return (True, state)
             else:
                 return (False, state)
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     nanostate = Nanostate(identity, addr)
     while True:
         time.sleep(1)
-        nanostate.send_state_update("Hello", "World")
+        nanostate.send_state_update("Hello", ("我是" + identity).encode("utf-8"))
         result, state = nanostate.recv_state_update()
-#        if result:
-#            print(identity + " received: " + str(state))
+        if result:
+            print(identity + " received: ", state[1], state[2])
