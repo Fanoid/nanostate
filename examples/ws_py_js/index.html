@@ -1,8 +1,8 @@
 <html>
   <head>
-    <script type='application/javascript' src='/js/jquery.min.js'></script>
-    <script type='application/javascript' src='/js/msgpack.min.js'></script>
-    <script type='application/javascript' src='/js/nanostate.js'></script>
+    <script type='application/javascript' src='js/jquery.min.js'></script>
+    <script type='application/javascript' src='js/msgpack.min.js'></script>
+    <script type='application/javascript' src='js/nanostate.js'></script>
     <script type='application/javascript'>
 function GetURLParameter(sParam, sDefault){
   var sPageURL = window.location.search.substring(1);
@@ -18,7 +18,7 @@ function GetURLParameter(sParam, sDefault){
 
 $(document).ready(function() {
   var identity = GetURLParameter("identity", "html");
-  var ws_host = GetURLParameter("ws_host", "127.0.0.1");
+  var ws_host = GetURLParameter("ws_host", "192.168.40.23");
   var ws_port = GetURLParameter("ws_port", "15001");
 
   websocket = 'ws://' + ws_host + ':' + ws_port + '/ws';
