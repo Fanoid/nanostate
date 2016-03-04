@@ -42,7 +42,7 @@ sock.rcvmaxsize(-1);
 
 sock.on("data", function (buf) {
 //  console.log("sock received: %s", buf);
-  console.log(sock)
+//  console.log(sock)
   sock.send(buf);
   wss.broadcast(buf);
 });
