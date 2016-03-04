@@ -1,0 +1,19 @@
+{
+  "name": "nodenanostate",
+  "version": "0.1.0",
+  "description": "Nanostate for Node.js",
+  "main": "nanostate.js",
+  "dependencies": {
+    "minimist": "^1.2.0"
+  },
+  "devDependencies": {
+    "argparse": "^1.0.6",
+    "nanomsg": "^3.1.0",
+    "ws": "^1.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fan Hong",
+  "license": "UNLICENSED"
+}
