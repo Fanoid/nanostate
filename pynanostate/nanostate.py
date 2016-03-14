@@ -31,20 +31,24 @@ class Nanostate:
         state = None
         try:
             buf = self._sock.recv()
-            state = msgpack.unpackb(buf, use_list = False, encoding = 'utf-8')
-            if state[0] != self._identity:
-#                print(self._identity + " received: " + str(state))
-                return (True, state)
-            else:
-                return (False, state)
+            unpacked = msgpack.unpackb(buf, use_list = False, encoding = 'utf-8')
+            try:
+                state = {
+                    "sender": unpacked[0],
+                    "name": unpacked[1],
+                    "data": unpacked[2],
+                }
+                return state
+            except IndexError:
+                return None
         except NanoMsgError:
-            return (False, state)
+            return None
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="A nanostate client written by Python.")
-    parser.add_argument('--identity', '-I', dest = "identity", required = True, help = "A string to identiy this client")
-    parser.add_argument('--connect', '-C', dest = "addr", required = True, help = "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'")
+    parser.add_argument('--identity', '-I', dest = "identity", default = "pynanostate", help = "A string to identiy this client")
+    parser.add_argument('--connect', '-C', dest = "addr", default = "tcp://127.0.0.1:15000", help = "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'")
 
     args = parser.parse_args()
     print(args)
@@ -55,6 +59,6 @@ if __name__ == "__main__":
     while True:
         time.sleep(1)
         nanostate.send_state_update("Hello", ("我是" + identity).encode("utf-8"))
-        result, state = nanostate.recv_state_update()
-        if result:
+        state = nanostate.recv_state_update()
+        if state != None:
             print(identity + " received: ", state[1], state[2])
