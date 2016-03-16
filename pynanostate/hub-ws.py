@@ -10,10 +10,10 @@ from ws4py.messaging import TextMessage
 import argparse
 
 parser = argparse.ArgumentParser(description="A nanostate hub with router between websocket written by Python.")
-parser.add_argument('--bind', '-B', dest = "addr", required = True, help = "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'")
+parser.add_argument('--bind', '-B', dest = "addr", default = "tcp://*:15000", help = "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'. Bind to 'tcp://*:15000' by default.")
 
-parser.add_argument("--ws_host", dest = "ws_host", required = True, help = "The address to bind websocket server, such as 127.0.0.1")
-parser.add_argument("--ws_port", dest = "ws_port", type=int, required = True, help = "The port to bind websocket server, such as 15001")
+parser.add_argument("--ws_host", dest = "ws_host", default = "0.0.0.0", help = "The address to bind websocket server, such as '127.0.0.1'. Bind to '0.0.0.0' (all interfaces) by default.")
+parser.add_argument("--ws_port", dest = "ws_port", type=int, default = 15001, help = "The port to bind websocket server, such as '15001'. Bind to '15001' by default.")
 
 args = parser.parse_args()
 print(args)

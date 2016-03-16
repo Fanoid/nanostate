@@ -9,15 +9,15 @@ parser.addArgument(
     ["--bind", "-B"],
     {
       dest: "addr",
-      defaultValue: "tcp://127.0.0.1:15000",
-      help: "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'"
+      defaultValue: "tcp://*:15000",
+      help: "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'. Bind to 'tcp://*:15000' by default."
     });
 parser.addArgument(
     ["--ws_host"],
     {
       dest: "ws_host",
-      defaultValue: "127.0.0.1",
-      help: "The address to bind websocket server, such as 127.0.0.1"
+      defaultValue: "0.0.0.0",
+      help: "The address to bind websocket server, such as '127.0.0.1'. Bind to '0.0.0.0' (all interfaces) by default."
     });
 parser.addArgument(
     ["--ws_port"],
@@ -25,7 +25,7 @@ parser.addArgument(
       dest: "ws_port",
       type: "int",
       defaultValue: 15001,
-      help: "The port to bind websocket server, such as 15001"
+      help: "The port to bind websocket server, such as '15001'. Bind to '15001' by default."
     });
 
 var args = parser.parseArgs();

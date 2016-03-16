@@ -3,7 +3,7 @@ from nanomsg import *
 import argparse
 
 parser = argparse.ArgumentParser(description="A nanostate hub written by Python.")
-parser.add_argument('--bind', '-B', dest = "addr", required = True, help = "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'")
+parser.add_argument('--bind', '-B', dest = "addr", default = "tcp://*:15000", help = "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'. Bind to 'tcp://*:15000' by default.")
 
 args = parser.parse_args()
 addr = args.addr

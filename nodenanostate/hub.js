@@ -8,8 +8,8 @@ parser.addArgument(
     ["--bind", "-B"],
     {
       dest: "addr",
-      defaultValue: "tcp://127.0.0.1:15000",
-      help: "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'"
+      defaultValue: "tcp://*:15000",
+      help: "The address to bind, which should be compatible with nanomsg, such as 'tcp://127.0.0.1:15000'. Bind to 'tcp://*:15000' by default."
     });
 
 var args = parser.parseArgs()
