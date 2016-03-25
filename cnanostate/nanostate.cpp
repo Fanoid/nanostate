@@ -67,7 +67,16 @@ bool Nanostate::recv_state_update(string &sender, string &name, vector<char> &da
 
   msgpack::object deserialized = result.get();
   msgpack::type::tuple<string, string, vector<char> > dst;
-  deserialized.convert(&dst);
+  try
+  {
+    deserialized.convert(&dst);
+  }
+  catch (msgpack::v1::type_error e)
+  {
+    fprintf(stderr, "nn_recv failed: %s\n", e.what());
+    nn_freemsg(buf);
+    return false;
+  }
 
   sender = dst.get<0>();
   name = dst.get<1>();
